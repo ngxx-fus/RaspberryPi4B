@@ -1,0 +1,12 @@
+a.txt
+
+1a
+9a
+4t
+aa
+bb
+ee
+44
+es
+ac
+er
