@@ -14,13 +14,14 @@ import numpy as np
 from PIL import Image, ImageFont, ImageDraw
 
 class OLED_32x128:
-    def __init__(self, db_path = './DB', based_canvas = 'white'):
+    def __init__(self, db_path = './DB', based_canvas = 'white', thres=50):
         self.the_oled = SSD1306_128_32()
         self.based_canvas = based_canvas # white / ruler / disk / RAM ...
         self.db_path = db_path
         self.temporary_canvas = Image.fromarray(np.zeros((32, 128)))
         self.canvas = Image.fromarray(np.zeros((32, 128)))
         self.prev_canvas = Image.fromarray(np.zeros((32, 128)))
+        # self.thres = thres
 
     def start(self):
         self.load_canvas()
@@ -66,7 +67,7 @@ class OLED_32x128:
     def display(self):
         self.the_oled.display()
     
-    def add_text(self, text="HelloW!", pos=(0, 0), size=12, color=(255,255,255), load_prev=False, save_curr=False):
+    def add_text(self, text="HelloW!", pos=(0, 0), size=12, color=(255,255,255), load_prev=False, save_curr=False, thres=80):
         Img = self.canvas.copy()
         if load_prev == True:
             Img = self.prev_canvas.copy()
@@ -75,7 +76,7 @@ class OLED_32x128:
         DrawnImg.text(pos, text, color, FontImg)
         if save_curr == True:
             self.prev_canvas = Img
-        self.the_oled._buffer = extract_img(Img, thres=50)
+        self.the_oled._buffer = extract_img(Img, thres=thres)
         self.the_oled.display()
 
     def add_image(self, img, pos=(0, 0), thres=100, load_prev=False, save_curr=False):
