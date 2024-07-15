@@ -1,3 +1,7 @@
+"""
+    source code: https://pypi.org/project/mfrc522-python/
+    modified by: ngxx-fus
+"""
 import RPi.GPIO as GPIO
 import spidev
 import logging
@@ -169,8 +173,15 @@ class MFRC522:
         register address and the value to be written.
 
         Args:
-            :param: (int): the address of the register to write to, in the range 0x00-0xFF.
+            :param: (int): the address of the register to write to, in the range 0x00-0x5F.
             val (int): the value to write to the register, in the range 0x00-0xFF.
+        """
+        """
+        Address frame:
+        r/w mode      address    reserve
+           []      [][][][][][]     []
+        1: r                     rcm: 0
+        0: w
         """
         val = self.spi.xfer2([(addr << 1) & 0x7E, val])
 
@@ -186,6 +197,13 @@ class MFRC522:
 
         Returns:
             The value read from the register.
+        """
+        """
+        Address frame:
+        r/w mode      address      reserve
+           []      [][] [][][][]     []
+        1: r                        RFU
+        0: w
         """
         val = self.spi.xfer2([((addr << 1) & 0x7E) | 0x80, 0])
         return val[1]
@@ -304,7 +322,7 @@ class MFRC522:
             self.SetBitMask(self.BitFramingReg, 0x80)
 
         # Wait for command execution (timeout)
-        i = 2000
+        i = 5 #org: 2000
         while True:
             time.sleep(0.35)
             n = self.ReadReg(self.CommIrqReg)
@@ -553,7 +571,10 @@ class MFRC522:
             blockAddr (int): The block address of the RFID card to read from.
 
         Returns:
-            If the read is successful and the received data is of the correct length, the function returns the received data as a list of 16 bytes. If the read is unsuccessful or the received data is of incorrect length, the function returns None.
+            If the read is successful and the received data is of the correct length, 
+            the function returns the received data as a list of 16 bytes. 
+            If the read is unsuccessful or the received data is of incorrect length, 
+            the function returns None.
         """
 
         # create an array containing the READ command and the block address to be read
@@ -566,8 +587,7 @@ class MFRC522:
         recvData.append(pOut[0])
         recvData.append(pOut[1])
         # send the command and block address array to the RFID card and receive response
-        (status, backData, backLen) = self.MFRC522_ToCard(
-            self.PCD_TRANSCEIVE, recvData)
+        (status, backData, backLen) = self.MFRC522_ToCard(self.PCD_TRANSCEIVE, recvData)
         # if response status is not OK, print error message
         if not (status == self.MI_OK):
             self.logger.error("Error while reading!")
@@ -641,10 +661,36 @@ class MFRC522:
         self.Reset()
 
         # Set the timer mode and prescaler
+        """
+                  Tauto  Non gated mode    AutoRestart    TPrescalerReg[11:8] 
+            0x8D:   1          00             1                1110
+        """
         self.WriteReg(self.TModeReg, 0x8D)
+
+        """
+                  TPrescalerReg[7:0] 
+            0x3E:    0011 1110
+        """
         self.WriteReg(self.TPrescalerReg, 0x3E)
-        self.WriteReg(self.TReloadRegL, 30)
-        self.WriteReg(self.TReloadRegH, 0)
+
+        """
+                  TReloadRegL[7:0] 
+            0x1E:    0001 1110
+        """
+        self.WriteReg(self.TReloadRegL, 0x1E)
+
+        """
+                  TReloadRegL[15:8] 
+            0x00:    0000 0000
+        """
+        self.WriteReg(self.TReloadRegH, 0x00)
+        """
+        Delay time  = TReloadRegL*TPrescalerReg/6780000
+                    = (0x3E)x(0x0E3E)/6780000
+                    = 62x3646/6780000
+                    = 0.033341003s
+        """
+
 
         # Enable the auto-timer for transmission and set the mode
         self.WriteReg(self.TxAutoReg, 0x40)
