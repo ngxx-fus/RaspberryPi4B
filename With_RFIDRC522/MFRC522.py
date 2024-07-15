@@ -497,6 +497,8 @@ class MFRC522:
 
         # Add the serial number of the tag to the buffer
         for i in range(5):
+            if len(serNum) <= i:
+                return 0
             buf.append(serNum[i])
 
         # Calculate the CRC values for the buffer and add them to the buffer
@@ -543,6 +545,8 @@ class MFRC522:
 
         # Next we append the first 4 bytes of the UID
         for i in range(4):
+            if i >= len(serNum):
+                return 2
             buff.append(serNum[i])
 
         # Now we start the authentication itself
