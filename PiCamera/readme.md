@@ -1,5 +1,29 @@
+# Test PiCamera2
+## Sơ đồ khối:
+<br>
+<img src="https://github.com/user-attachments/assets/fa7d6360-516e-4966-bd7b-f9053fd0b0ed" width="501">
+<br>
+
+## Mô tả:
+Raspberry Pi 4:
+
+|  |  |
+| :--: | :-- |
+| testPiCamera.py | Sử dụng thư viện **picamera2**, chụp ảnh và lưu local thành test.jpg mỗi 250ms, sau đó gọi chương trình SendBack.sh. |
+| SendBack.sh | Sử dụng **scp** gởi đến máy tính cá nhân chạy Ubuntu đã bật ssh-server và lưu tại **~/Downloads/**. |
+
+Computer:
+
+|  |  |
+| :--: | :-- |
+| ShowImg.sh | Sử dụng **eog** để mở ảnh lưu tại **~/Downloads/** mỗi 250ms. |
+
+<br>
+<div style="page-break-after: always;"></div>
+<br>
+
 # Install Anaconda on Raspberry Pi 4 B+
-## 1 References link list:
+## References link list:
     https://github.com/conda-forge/miniforge 
 
 Sử dụng wget để tải Miniforge3-Linux-aarch64.sh
@@ -26,6 +50,7 @@ Trong trường hợp vẫn chưa sử dụng được lệnh “conda” thì: 
 <br>
 <img src="https://github.com/user-attachments/assets/733a291b-9744-4d99-ae0d-6f925629b077" width="501">
 <br>
+
 # Install lib picamera2 on Raspberry Pi 4 B+
 Hướng dẫn chính thức, nếu làm theo hướng dẫn không được, thì thử cách bên dưới:
 
@@ -93,4 +118,3 @@ Với
 
 **Tóm lại trường hợp bài viết, ta copy hết cái gì trong dist-packages vào site-packages 🙂**
 Cuối cùng: Thử import lại và chạy!
-
