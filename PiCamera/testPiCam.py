@@ -7,7 +7,7 @@ picam2.configure(camera_config)
 #picam2.start_preview(Preview.QTGL)
 picam2.start()
 time.sleep(2)
-c = 100
+c = 1000
 
 while c:
     picam2.capture_file("test.jpg")
